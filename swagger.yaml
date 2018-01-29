@@ -26,7 +26,7 @@ paths:
       responses:
         '200':
           description: Service is ready
-  '/images/list-all':
+  '/images':
     get:
       tags:
         - Admin Services
@@ -42,7 +42,22 @@ paths:
           description: No suitable permissions
         '404':
           description: No image found
-  '/images/register-new':
+  '/images/{repo}':
+    get:
+      tags:
+        - Admin Services
+      operationId: f8a_monitoring.api_v1.get_image_info
+      summary: Get the id of the registered image
+      responses:
+        '200':
+          schema:
+            $ref: "#/definitions/Image"
+          description: All registered images
+        '401':
+          description: No suitable permissions
+        '404':
+          description: No image found
+  '/images/add':
     post:
       tags:
         - Admin Services
@@ -68,7 +83,7 @@ paths:
           description: New analyses job scheduled
         '401':
           description: No suitable permissions
-  '/images/deregister':
+  '/images/delete':
     post:
       tags:
         - Admin Services
@@ -89,6 +104,39 @@ paths:
           description: No suitable permissions
         '404':
           description: No image found
+
+  '/scan':
+    get:
+      tags:
+        - Diagnosis Services
+      operationId: f8a_monitoring.api_v1.scan_all_images
+      summary: Scan a registered image
+      responses:
+        '200':
+          type: array
+          schema:
+            $ref: "#/definitions/ImageInfo"
+          description: Healthcheck data for all images
+        '401':
+          description: No suitable permissions
+        '404':
+          description: No image found
+
+  '/scan/{id}':
+    get:
+      tags:
+        - Diagnosis Services
+      operationId: f8a_monitoring.api_v1.scan_image
+      summary: Scan a registered image
+      responses:
+        '200':
+          schema:
+            $ref: "#/definitions/ImageInfo"
+          description: healthcheck data for the given image
+        '401':
+          description: No suitable permissions
+        '404':
+          description: No image found
 definitions:
   Image:
     properties:
@@ -98,5 +146,3 @@ definitions:
       github_repo:
         type: string
         description: The corresponding github repository
-
-
