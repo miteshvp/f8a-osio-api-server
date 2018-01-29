@@ -1,0 +1,102 @@
+swagger: '2.0'
+info:
+  title: API for Openshift.io health monitoring
+  version: '0.1'
+basePath: /api/v1/
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /liveness:
+    get:
+      tags:
+        - Service settings
+      operationId: f8a_jobs.api_v1.get_liveness
+      summary: Get job service liveness
+      responses:
+        '200':
+          description: Service is alive
+  /readiness:
+    get:
+      tags:
+        - Service settings
+      operationId: f8a_jobs.api_v1.get_readiness
+      summary: Get job service readiness
+      responses:
+        '200':
+          description: Service is ready
+  '/images/list-all':
+    get:
+      tags:
+        - Admin Services
+      operationId: f8a_monitoring.api_v1.list_all_images
+      summary: Get all registered images
+      responses:
+        '200':
+          type: array
+          schema:
+            $ref: "#/definitions/Image"
+          description: All registered images
+        '401':
+          description: No suitable permissions
+        '404':
+          description: No image found
+  '/images/register-new':
+    post:
+      tags:
+        - Admin Services
+      operationId: f8a_monitoring.api_v1.register_new_image
+      summary: Register a new image for monitoring
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: file
+          in: formData
+          required: true
+          description: Job identifier
+          type: file
+        - name: github_repo
+          in: github_repo
+          required: true
+          description: Github repository corresponding to the image
+          type: string
+      responses:
+        '201':
+          description: New analyses job scheduled
+        '401':
+          description: No suitable permissions
+  '/images/deregister':
+    post:
+      tags:
+        - Admin Services
+      operationId: f8a_monitoring.api_v1.deregister_image
+      summary: Deregister a monitored image
+      consumes:
+        - application/json
+      parameters:
+        - name: github_repo
+          in: github_repo
+          required: true
+          description: Github repository corresponding to the image
+          type: string
+      responses:
+        '200':
+          description: Successfully deregistered the image
+        '401':
+          description: No suitable permissions
+        '404':
+          description: No image found
+definitions:
+  Image:
+    properties:
+      id:
+        type: string
+        description: Unique identifier for the registered image
+      github_repo:
+        type: string
+        description: The corresponding github repository
+
+
