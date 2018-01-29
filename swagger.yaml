@@ -47,7 +47,7 @@ paths:
       tags:
         - Admin Services
       operationId: f8a_monitoring.api_v1.get_image_info
-      summary: Get the id of the registered image
+      summary: Get the id of the registered image based on the repo
       parameters:
         - in: path
           name: repo
@@ -68,6 +68,32 @@ paths:
       tags:
         - Admin Services
       operationId: f8a_monitoring.api_v1.register_new_image
+      summary: Register a new image for monitoring
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - in: formData
+          name: file
+          required: true
+          description: Job identifier
+          type: file
+        - in: formData
+          name: github_repo
+          required: true
+          description: Github repository corresponding to the image
+          type: string
+      responses:
+        '201':
+          description: New analyses job scheduled
+        '401':
+          description: No suitable permissions
+  '/images/update':
+    post:
+      tags:
+        - Admin Services
+      operationId: f8a_monitoring.api_v1.update_image
       summary: Register a new image for monitoring
       consumes:
         - multipart/form-data
@@ -112,7 +138,6 @@ paths:
           description: No suitable permissions
         '404':
           description: No image found
-
   '/scan':
     get:
       tags:
@@ -165,8 +190,7 @@ definitions:
       id:
         type: string
         description: Unique identifier for the registered image
-      github_repo:
-        type: string
-        description: The corresponding github repository
+      data:
+        type: object
+        description: Scan report of the image
 
-      
