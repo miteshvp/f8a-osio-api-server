@@ -1,0 +1,212 @@
+---
+swagger: "2.0"
+info:
+  version: "0.1"
+  title: "API for Openshift.io health monitoring"
+basePath: "/api/v1/"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths:
+  /liveness:
+    get:
+      tags:
+      - "Service settings"
+      summary: "Get job service liveness"
+      operationId: "get_liveness"
+      parameters: []
+      responses:
+        200:
+          description: "Service is alive"
+      x-swagger-router-controller: "swagger_server.controllers.service_settings_controller"
+  /readiness:
+    get:
+      tags:
+      - "Service settings"
+      summary: "Get job service readiness"
+      operationId: "get_readiness"
+      parameters: []
+      responses:
+        200:
+          description: "Service is ready"
+      x-swagger-router-controller: "swagger_server.controllers.service_settings_controller"
+  /reports:
+    get:
+      tags:
+      - "Healthcheck Services"
+      summary: "Get healthcheck report for all registered repositories"
+      operationId: "get_all_repo_report"
+      parameters: []
+      responses:
+        200:
+          description: "Healthcheck data for all registered repositories"
+        401:
+          description: "No suitable permissions"
+        404:
+          description: "No image found"
+      x-swagger-router-controller: "swagger_server.controllers.healthcheck_services_controller"
+  /reports/{name}:
+    get:
+      tags:
+      - "Healthcheck Services"
+      summary: "Get healthcheck report for a registered repository"
+      operationId: "get_repo_report"
+      parameters:
+      - name: "name"
+        in: "path"
+        description: "github repository name"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Healthcheck report for given registered repository"
+          schema:
+            $ref: "#/definitions/Report"
+        401:
+          description: "No suitable permissions"
+        404:
+          description: "No image found"
+      x-swagger-router-controller: "swagger_server.controllers.healthcheck_services_controller"
+  /repos/register:
+    post:
+      tags:
+      - "Admin Services"
+      summary: "Register a repository for monitoring"
+      operationId: "register_repo"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "repo"
+        description: "A registered repository"
+        required: true
+        schema:
+          $ref: "#/definitions/Repo"
+      responses:
+        201:
+          description: "New repository registered"
+        401:
+          description: "No suitable permissions"
+      x-swagger-router-controller: "swagger_server.controllers.admin_services_controller"
+  /repos/deregister:
+    post:
+      tags:
+      - "Admin Services"
+      summary: "Deregister a monitored repository"
+      operationId: "deregister_repo"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "repo"
+        description: "A registered repository"
+        required: true
+        schema:
+          $ref: "#/definitions/Repo"
+      responses:
+        200:
+          description: "Successfully deregistered the repository"
+        401:
+          description: "No suitable permissions"
+        404:
+          description: "No repository found"
+      x-swagger-router-controller: "swagger_server.controllers.admin_services_controller"
+  /repos/suspend:
+    post:
+      tags:
+      - "Admin Services"
+      summary: "Suspend a monitored repository temporarily"
+      operationId: "suspend_repo"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "repo"
+        description: "A registered repository"
+        required: true
+        schema:
+          $ref: "#/definitions/Repo"
+      responses:
+        200:
+          description: "Successfully deregistered the repository"
+        401:
+          description: "No suitable permissions"
+        404:
+          description: "No repository found"
+      x-swagger-router-controller: "swagger_server.controllers.admin_services_controller"
+  /repos/revive:
+    post:
+      tags:
+      - "Admin Services"
+      summary: "Revive a suspended repository for monitoring"
+      operationId: "revive_repo"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "repo"
+        description: "A registered repository"
+        required: true
+        schema:
+          $ref: "#/definitions/Repo"
+      responses:
+        200:
+          description: "Successfully deregistered the repository"
+        401:
+          description: "No suitable permissions"
+        404:
+          description: "No repository found"
+      x-swagger-router-controller: "swagger_server.controllers.admin_services_controller"
+  /scan:
+    post:
+      tags:
+      - "Healthcheck Services"
+      summary: "Scan registered repositories"
+      operationId: "scan_repo"
+      parameters:
+      - in: "body"
+        name: "repos"
+        description: "List of registered repositories. Wildcard character '*' is supported\
+          \ for all repositories."
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/Repo"
+      responses:
+        201:
+          description: "Started healthcheck for the given repository"
+        401:
+          description: "No suitable permissions"
+        404:
+          description: "No image found"
+      x-swagger-router-controller: "swagger_server.controllers.healthcheck_services_controller"
+definitions:
+  Report:
+    type: "object"
+    properties:
+      cve:
+        type: "array"
+        items:
+          type: "string"
+      license:
+        type: "array"
+        items:
+          type: "string"
+    title: "Healthcheck Report"
+    description: "Healthcheck Report"
+  Repo:
+    properties:
+      name:
+        type: "string"
+    title: "Github Repository"
+    description: "Github Repository"
